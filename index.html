@@ -30,40 +30,35 @@
     <div id="status" style="margin-top: 20px;"></div>
 
     <script>
-        const API_URL = 'https://macha111.pythonanywhere.com/api/command';
-        const API_KEY = 'cfel'; // Zmień na swój klucz
+const API_URL = 'https://macha111.pythonanywhere.com/api/command';
+const API_KEY = 'TAJNY_KLUCZ_123'; // MUSI BYĆ IDENTYCZNY JAK W APLIKACJI
 
-        async function sendCommand() {
-            const command = document.getElementById('commandInput').value;
-            const statusDiv = document.getElementById('status');
-
-            if(!command) {
-                statusDiv.textContent = "Proszę wpisać komendę!";
-                return;
-            }
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-Key': API_KEY
-                    },
-                    body: JSON.stringify({ command: command })
-                });
-
-                const data = await response.json();
-                
-                if(response.ok) {
-                    statusDiv.textContent = `✅ Komenda "${command}" wysłana! ID: ${data.id}`;
-                } else {
-                    statusDiv.textContent = `❌ Błąd: ${data.error}`;
-                }
-            } catch(error) {
-                statusDiv.textContent = "🔥 Błąd połączenia z serwerem";
-                console.error("Szczegóły błędu:", error);
-            }
+async function sendCommand() {
+    const command = document.getElementById('commandInput').value;
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-Key': API_KEY // Klucz w nagłówku
+            },
+            body: JSON.stringify({ command })
+        });
+        
+        const data = await response.json();
+        console.log("Odpowiedź serwera:", data); // Debug
+        
+        if(response.ok) {
+            document.getElementById('status').textContent = "✅ Komenda wysłana!";
+        } else {
+            document.getElementById('status').textContent = `❌ Błąd: ${data.error}`;
         }
-    </script>
+    } catch(error) {
+        console.error("Pełny błąd:", error);
+        document.getElementById('status').textContent = "🔥 Błąd połączenia";
+    }
+}
+</script>
 </body>
 </html>
