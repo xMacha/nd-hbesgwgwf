@@ -1,1 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Łączenie z komputerem</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+    <input type="text" id="computerId" placeholder="Wpisz identyfikator komputera">
+    <button onclick="connect()">Połącz</button>
+    <div id="status"></div>
 
+    <script>
+        const firebaseConfig = {
+            apiKey: "TWÓJ_API_KEY",
+            authDomain: "TWÓJ_PROJEKT.firebaseapp.com",
+            databaseURL: "https://TWÓJ-PROJEKT.firebaseio.com",
+            projectId: "TWÓJ_PROJEKT"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        let currentComputerRef;
+
+        function connect() {
+            const computerId = document.getElementById('computerId').value;
+            currentComputerRef = firebase.database().ref(`computers/${computerId}`);
+
+            // Sprawdź czy komputer istnieje
+            currentComputerRef.once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    document.getElementById('status').innerText = 
+                        `Połączono z komputerem: ${snapshot.val().ip}`;
+                    enableControls();
+                } else {
+                    alert('Nie znaleziono komputera!');
+                }
+            });
+        }
+
+        function sendCommand(command) {
+            if (!currentComputerRef) return;
+            currentComputerRef.child('commands').set(command);
+        }
+
+        function enableControls() {
+            // Tutaj dodaj przyciski do wysyłania komend
+            document.body.innerHTML += `
+                <button onclick="sendCommand('start')">Uruchom proces</button>
+                <button onclick="sendCommand('stop')">Zatrzymaj</button>
+            `;
+        }
+    </script>
+</body>
+</html>
