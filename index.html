@@ -1,53 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Łączenie z komputerem</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <title>Panel sterowania</title>
 </head>
 <body>
-    <input type="text" id="computerId" placeholder="Wpisz identyfikator komputera">
-    <button onclick="connect()">Połącz</button>
+    <input type="text" id="apiKey" placeholder="Wpisz API Key">
+    <input type="text" id="command" placeholder="Wpisz komendę">
+    <button onclick="sendCommand()">Wyślij</button>
     <div id="status"></div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAmS77cbWRP20AxYfo51SlW74WlU3zHAGc",
-            authDomain: "python-71e35.firebaseapp.com",
-            databaseURL: "https://TWÓJ-PROJEKT.firebaseio.com",
-            projectId: "python-71e35"
-        };
+        const API_URL = 'https://[twoja-nazwa].pythonanywhere.com/api/command';
 
-        firebase.initializeApp(firebaseConfig);
-        let currentComputerRef;
+        async function sendCommand() {
+            const apiKey = document.getElementById('apiKey').value;
+            const command = document.getElementById('command').value;
 
-        function connect() {
-            const computerId = document.getElementById('computerId').value;
-            currentComputerRef = firebase.database().ref(`computers/${computerId}`);
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({ command })
+                });
 
-            // Sprawdź czy komputer istnieje
-            currentComputerRef.once('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    document.getElementById('status').innerText = 
-                        `Połączono z komputerem: ${snapshot.val().ip}`;
-                    enableControls();
-                } else {
-                    alert('Nie znaleziono komputera!');
-                }
-            });
-        }
-
-        function sendCommand(command) {
-            if (!currentComputerRef) return;
-            currentComputerRef.child('commands').set(command);
-        }
-
-        function enableControls() {
-            // Tutaj dodaj przyciski do wysyłania komend
-            document.body.innerHTML += `
-                <button onclick="sendCommand('start')">Uruchom proces</button>
-                <button onclick="sendCommand('stop')">Zatrzymaj</button>
-            `;
+                document.getElementById('status').innerText = 
+                    response.ok ? "Komenda wysłana!" : "Błąd wysyłania!";
+            } catch (error) {
+                document.getElementById('status').innerText = "Błąd połączenia!";
+            }
         }
     </script>
 </body>
