@@ -4,13 +4,13 @@
     <title>Panel sterowania</title>
 </head>
 <body>
-    <input type="text" id="apiKey" placeholder="Wpisz API Key">
+    <input type="text" id="apiKey" placeholder="Wpisz hasło">
     <input type="text" id="command" placeholder="Wpisz komendę">
     <button onclick="sendCommand()">Wyślij</button>
     <div id="status"></div>
 
     <script>
-        const API_URL = 'https://[twoja-nazwa].pythonanywhere.com/api/command';
+        const API_URL = 'https://macha11.pythonanywhere.com/api/command';
 
         async function sendCommand() {
             const apiKey = document.getElementById('apiKey').value;
