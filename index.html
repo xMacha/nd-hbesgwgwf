@@ -1,25 +1,69 @@
-<script>
-const API_URL = 'https://macha11.pythonanywhere.com/api/command';
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Sterowania</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wyślij komendę</h1>
+    
+    <div>
+        <input type="text" id="commandInput" placeholder="Wpisz komendę">
+        <button onclick="sendCommand()">Wyślij</button>
+    </div>
+    
+    <div id="status" style="margin-top: 20px;"></div>
 
-async function sendCommand() {
-    const apiKey = "cfel"; // Stały klucz w kodzie
-    const command = document.getElementById('command').value;
+    <script>
+        const API_URL = 'https://macha111.pythonanywhere.com/api/command';
+        const API_KEY = 'TAJNY_KLUCZ_123'; // Zmień na swój klucz
 
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-Key': apiKey  // Dodajemy nagłówek
-            },
-            body: JSON.stringify({ command: command })
-        });
-        
-        const result = await response.json();
-        document.getElementById('status').innerText = 
-            response.ok ? "Komenda wysłana!" : result.error;
-    } catch (error) {
-        document.getElementById('status').innerText = "Błąd połączenia!";
-    }
-}
-</script>
+        async function sendCommand() {
+            const command = document.getElementById('commandInput').value;
+            const statusDiv = document.getElementById('status');
+
+            if(!command) {
+                statusDiv.textContent = "Proszę wpisać komendę!";
+                return;
+            }
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': API_KEY
+                    },
+                    body: JSON.stringify({ command: command })
+                });
+
+                const data = await response.json();
+                
+                if(response.ok) {
+                    statusDiv.textContent = `✅ Komenda "${command}" wysłana! ID: ${data.id}`;
+                } else {
+                    statusDiv.textContent = `❌ Błąd: ${data.error}`;
+                }
+            } catch(error) {
+                statusDiv.textContent = "🔥 Błąd połączenia z serwerem";
+                console.error("Szczegóły błędu:", error);
+            }
+        }
+    </script>
+</body>
+</html>
